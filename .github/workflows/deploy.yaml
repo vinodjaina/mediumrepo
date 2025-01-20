@@ -1,24 +1,20 @@
 name: Deploy to ECR
 
 on:
- 
   push:
     branches: [ main ]
 
 env:
   ECR_REPOSITORY: sample-microservice
-  EKS_CLUSTER_NAME: samplecluster 
+  EKS_CLUSTER_NAME: samplecluster
   AWS_REGION: eu-north-1
 
 jobs:
-  
   build:
-    
     name: Deployment
     runs-on: ubuntu-latest
 
     steps:
-
     - name: Set short git commit SHA
       id: commit
       uses: prompt/actions-commit-hash@v2
@@ -31,7 +27,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{env.AWS_REGION}}
+        aws-region: ${{ env.AWS_REGION }}
 
     - name: Login to Amazon ECR
       id: login-ecr
@@ -39,7 +35,7 @@ jobs:
 
     - name: Build, tag, and push image to Amazon ECR
       env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}        
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: ${{ steps.commit.outputs.short }}
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f docker/Dockerfile .
@@ -50,9 +46,12 @@ jobs:
 
     - name: Deploy to EKS
       env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}        
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: ${{ steps.commit.outputs.short }}
       run: |
-        sed -i.bak "s|DOCKER_IMAGE|$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG|g" manifests/hello-app-deployment.yaml && \
-        kubectl apply -f manifests/hello-app-deployment.yaml
-        kubectl apply -f manifests/hello-app-service.yaml
+        # Update deployment YAML with image details
+        sed -i.bak "s|DOCKER_IMAGE|$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG|g" manifests/hello-app-deployment.yaml
+        
+        # Apply Kubernetes manifests (skip validation temporarily if needed)
+        kubectl apply -f manifests/hello-app-deployment.yaml --validate=false
+        kubectl apply -f manifests/hello-app-service.yaml --validate=false

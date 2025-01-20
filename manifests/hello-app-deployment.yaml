@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: hello-app
-        image: DOCKER_IMAGE
+        image: 970547359273.dkr.ecr.eu-north-1.amazonaws.com/sample-microservice
         imagePullPolicy: Always
         ports:
         - containerPort: 8080

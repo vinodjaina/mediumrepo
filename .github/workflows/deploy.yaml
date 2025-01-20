@@ -52,6 +52,6 @@ jobs:
         # Update deployment YAML with image details
         sed -i.bak "s|DOCKER_IMAGE|$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG|g" manifests/hello-app-deployment.yaml
         
-        # Apply Kubernetes manifests (skip validation temporarily if needed)
+        # Apply Kubernetes manifests (skip validation temporarily if needed )
         kubectl apply -f manifests/hello-app-deployment.yaml --validate=false
         kubectl apply -f manifests/hello-app-service.yaml --validate=false

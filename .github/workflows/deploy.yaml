@@ -6,7 +6,7 @@ on:
 
 env:
   ECR_REPOSITORY: sample-microservice
-  EKS_CLUSTER_NAME: sample-cluster
+  EKS_CLUSTER_NAME: samplecluster
   AWS_REGION: eu-north-1
 
 jobs:
